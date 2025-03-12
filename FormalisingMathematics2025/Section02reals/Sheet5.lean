@@ -14,17 +14,19 @@ open Section2sheet3solutions
 
 -- you can maybe do this one now
 theorem tendsTo_neg {a : ℕ → ℝ} {t : ℝ} (ha : TendsTo a t) : TendsTo (fun n ↦ -a n) (-t) := by
-  rw [tendsTo_def] at ha ⊢
+  rw [tendsTo_def]
   intro ε hε
   specialize ha ε hε
-  rcases ha with ⟨B, hB⟩
-  use B
-  intro n hn
-  rw [← abs_neg]
-  ring_nf
-  specialize hB n hn
-  exact hB
-  done
+  rcases ha with ⟨b, hb⟩
+  use b
+  intro n bn
+  specialize hb n bn
+  have h : |a n - t| = |- a n - -t| := by
+    rw [← (abs_neg (a n - t))]
+    congr
+    ring
+  rw [← h]
+  exact hb
 
 /-
 `tendsTo_add` is the next challenge. In a few weeks' time I'll
@@ -40,6 +42,35 @@ of the results we proved in sheet 4 will be helpful.
 tends to `t + u`. -/
 theorem tendsTo_add {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
     TendsTo (fun n ↦ a n + b n) (t + u) := by
+  intro ε hε
+  specialize ha (ε/2) (by linarith)
+  specialize hb (ε/2) (by linarith)
+  rcases ha with ⟨aB, haB⟩
+  rcases hb with ⟨bB, hbB⟩
+  let B := max aB bB
+  use B
+  intro n hn
+  have h1 : aB ≤ n := by
+    trans B
+    · simp only [B]
+      exact Nat.le_max_left aB bB
+    exact hn
+  have h2 : bB ≤ n := by
+    trans B
+    · simp only [B]
+      exact Nat.le_max_right aB bB
+    exact hn
+  specialize haB n h1
+  specialize hbB n h2
+  dsimp only
+  calc
+    |a n + b n - (t + u)| = |(a n - t) + (b n - u)| := by ring_nf
+    _ ≤ |a n - t| + |b n - u| := by apply abs_add
+    _ < ε / 2 + ε / 2 := by linarith
+    _ = ε := by ring
+
+theorem tendsTo_add' {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
+  TendsTo (fun n ↦ a n + b n) (t + u) := by
   rw [tendsTo_def] at *
   -- let ε > 0 be arbitrary
   intro ε hε
@@ -65,6 +96,6 @@ tends to `t - u`. -/
 theorem tendsTo_sub {a b : ℕ → ℝ} {t u : ℝ} (ha : TendsTo a t) (hb : TendsTo b u) :
     TendsTo (fun n ↦ a n - b n) (t - u) := by
   -- this one follows without too much trouble from earlier results.
-  sorry
+  exact tendsTo_add ha (tendsTo_neg hb)
 
 end Section2sheet5

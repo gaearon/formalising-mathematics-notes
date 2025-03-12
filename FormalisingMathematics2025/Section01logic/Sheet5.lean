@@ -25,41 +25,55 @@ and also the following two new tactics:
 variable (P Q R S : Prop)
 
 example : P ↔ P := by
-  sorry
-  done
+  constructor <;> intro p <;> exact p
 
 example : (P ↔ Q) → (Q ↔ P) := by
-  sorry
-  done
+  intro h
+  rw [h]
 
 example : (P ↔ Q) ↔ (Q ↔ P) := by
-  sorry
-  done
+  constructor <;> intro h <;> rw [h]
 
 example : (P ↔ Q) → (Q ↔ R) → (P ↔ R) := by
-  sorry
-  done
+  intro h1 h2
+  rwa [← h2]
 
 example : P ∧ Q ↔ Q ∧ P := by
-  sorry
-  done
+  constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨h2, h1⟩
 
 example : (P ∧ Q) ∧ R ↔ P ∧ Q ∧ R := by
-  sorry
-  done
+  constructor
+  · rintro ⟨⟨p, q⟩, r⟩
+    exact ⟨p, q, r⟩
+  rintro ⟨p, q, r⟩
+  exact ⟨⟨p, q⟩, r⟩
 
 example : P ↔ P ∧ True := by
-  sorry
-  done
+  constructor
+  · intro p
+    exact ⟨p, by trivial⟩
+  rintro ⟨p⟩
+  exact p
 
 example : False ↔ P ∧ False := by
-  sorry
-  done
+  constructor
+  · intro f
+    exfalso
+    exact f
+  rintro ⟨-, f⟩
+  exact f
 
 example : (P ↔ Q) → (R ↔ S) → (P ∧ R ↔ Q ∧ S) := by
-  sorry
-  done
+  rintro ⟨pq, qp⟩ ⟨rs, sr⟩
+  constructor
+  · rintro ⟨p, r⟩
+    exact ⟨pq p, rs r⟩
+  rintro ⟨q, s⟩
+  exact ⟨qp q, sr s⟩
 
 example : ¬(P ↔ ¬P) := by
-  sorry
-  done
+  change (P ↔ ¬ P) → False
+  rintro ⟨pnp, npp⟩
+  by_cases p : P
+  · exact (pnp p) p
+  exact p (npp p)

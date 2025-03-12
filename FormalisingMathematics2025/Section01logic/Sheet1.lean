@@ -145,20 +145,22 @@ example : P → Q → P := by
 /-- If we know `P`, and we also know `P → Q`, we can deduce `Q`.
 This is called "Modus Ponens" by logicians. -/
 example : P → (P → Q) → Q := by
-  sorry
-  done
+  intro p pimpq
+  exact pimpq p
 
 /-- `→` is transitive. That is, if `P → Q` and `Q → R` are true, then
   so is `P → R`. -/
 example : (P → Q) → (Q → R) → P → R := by
-  sorry
-  done
+  intro pimpq qimpr p
+  exact qimpr (pimpq p)
 
 -- If `h : P → Q → R` with goal `⊢ R` and you `apply h`, you'll get
 -- two goals! Note that tactics operate on only the first goal.
 example : (P → Q → R) → (P → Q) → P → R := by
-  sorry
-  done
+  intro pqr pq p
+  apply pqr
+  · exact p
+  exact pq p
 
 /-
 
@@ -172,27 +174,46 @@ in this section, where you'll learn some more tactics.
 variable (S T : Prop)
 
 example : (P → R) → (S → Q) → (R → T) → (Q → R) → S → T := by
-  sorry
-  done
+  intro _ sq rt qr s
+  apply rt
+  apply qr
+  apply sq s
 
 example : (P → Q) → ((P → Q) → P) → Q := by
-  sorry
-  done
+  intro pq pqp
+  have p := pqp pq
+  exact pq p
 
 example : ((P → Q) → R) → ((Q → R) → P) → ((R → P) → Q) → P := by
-  sorry
-  done
+  intro pqr qrp rpq
+  apply qrp
+  intro q
+  apply pqr
+  intro p
+  apply rpq
+  intro r
+  exact p
 
 example : ((Q → P) → P) → (Q → R) → (R → P) → P := by
-  sorry
-  done
+  intro qpp qr rp
+  apply qpp
+  intro q
+  apply rp
+  apply qr q
 
 example : (((P → Q) → Q) → Q) → P → Q := by
-  sorry
-  done
+  intro pqqq p
+  apply pqqq
+  intro pq
+  apply pq p
 
 example :
     (((P → Q → Q) → (P → Q) → Q) → R) →
       ((((P → P) → Q) → P → P → Q) → R) → (((P → P → Q) → (P → P) → Q) → R) → R := by
-  sorry
-  done
+  intro h1 h2 h3
+  apply h2
+  intro ppq p
+  intro p2
+  apply ppq
+  intro p3
+  exact p

@@ -40,21 +40,21 @@ see if you can start beginning to guess what various lemmas should be called.
 
 -/
 
-example (x : ℝ) : |-x| = |x| := by exact?
+example (x : ℝ) : |-x| = |x| := by exact abs_neg x
 -- click where it says "try this" to replace
 -- `exact?` with an "exact" proof
 -- Why do this? Because it's quicker!
 
-example (x y : ℝ) : |x - y| = |y - x| := by exact?
+example (x y : ℝ) : |x - y| = |y - x| := by exact abs_sub_comm x y
 
 
 -- Hmm. What would a theorem saying "the max is
 -- less-or-equal to something iff something else
 -- be called, according to Lean's naming conventions?"
-example (A B C : ℕ) : max A B ≤ C ↔ A ≤ C ∧ B ≤ C := by exact?
+example (A B C : ℕ) : max A B ≤ C ↔ A ≤ C ∧ B ≤ C := by exact max_le_iff
 
 -- abs of something less than something...
-example (x y : ℝ) : |x| < y ↔ -y < x ∧ x < y := by exact?
+example (x y : ℝ) : |x| < y ↔ -y < x ∧ x < y := by exact abs_lt
 
 example (ε : ℝ) (hε : 0 < ε) : 0 < ε / 2 := by linarith
 

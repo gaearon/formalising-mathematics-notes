@@ -59,28 +59,20 @@ example : False → P := by
   done
 
 example : True → False → True → False → True → False := by
-  sorry
-  done
+  intro t f t2 f2 t3
+  exact f2
 
 example : P → (P → False) → False := by
-  sorry
-  done
+  intro p pf
+  exact pf p
 
 example : (P → False) → P → Q := by
-  sorry
-  done
+  intro pf p
+  exfalso
+  exact pf p
 
 example : (True → False) → P := by
-  intro h1
-  have h3 : False := by
-    apply h1
-    trivial
-  -- have h2 : True := by
-  --   trivial
-  -- apply h1 at h2
+  intro h
   exfalso
-  exact h3
-  -- apply h1
-  -- trivial
-  -- done
-  done
+  apply h
+  trivial

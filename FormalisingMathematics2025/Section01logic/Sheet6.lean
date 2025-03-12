@@ -27,49 +27,97 @@ and also the following tactics
 variable (P Q R S : Prop)
 
 example : P → P ∨ Q := by
-  intro hP
+  intro p
   left
-  exact hP
-  done
+  exact p
 
 example : Q → P ∨ Q := by
-  sorry
-  done
+  intro q
+  right
+  exact q
 
 example : P ∨ Q → (P → R) → (Q → R) → R := by
-  intro hPoQ
-  cases hPoQ with
-  | inl h => sorry
-  | inr h => sorry
-  done
+  intro porq pr qr
+  rcases porq with (p | q)
+  · exact pr p
+  exact qr q
 
 -- symmetry of `or`
 example : P ∨ Q → Q ∨ P := by
-  sorry
-  done
+  intro pq
+  rcases pq with (p | q)
+  · right
+    exact p
+  left
+  exact q
 
 -- associativity of `or`
 example : (P ∨ Q) ∨ R ↔ P ∨ Q ∨ R := by
-  sorry
-  done
+  constructor
+  · rintro ((p | q) | r)
+    · left
+      exact p
+    · right
+      left
+      exact q
+    right
+    right
+    exact r
+  rintro (p | q | r)
+  · left
+    left
+    exact p
+  · left
+    right
+    exact q
+  right
+  exact r
 
 example : (P → R) → (Q → S) → P ∨ Q → R ∨ S := by
-  sorry
-  done
+  rintro pr qs (p | q)
+  · left
+    exact pr p
+  right
+  exact qs q
 
 example : (P → Q) → P ∨ R → Q ∨ R := by
-  sorry
-  done
+  rintro pq (p | r)
+  · left
+    exact pq p
+  right
+  exact r
 
 example : (P ↔ R) → (Q ↔ S) → (P ∨ Q ↔ R ∨ S) := by
-  sorry
-  done
+  intro pr qs
+  rw [pr, qs]
 
 -- de Morgan's laws
 example : ¬(P ∨ Q) ↔ ¬P ∧ ¬Q := by
-  sorry
-  done
+  constructor
+  · intro npq
+    constructor
+    · intro p
+      apply npq
+      left
+      exact p
+    intro q
+    apply npq
+    right
+    exact q
+  rintro npnq  (p | q)
+  · exact npnq.1 p
+  · exact npnq.2 q
 
 example : ¬(P ∧ Q) ↔ ¬P ∨ ¬Q := by
-  sorry
-  done
+  constructor
+  · intro npq
+    by_cases hp: P
+    · right
+      intro q
+      apply npq
+      exact ⟨hp, q⟩
+    · left
+      exact hp
+  rintro (np | nq) ⟨p, q⟩
+  · contradiction
+  contradiction
