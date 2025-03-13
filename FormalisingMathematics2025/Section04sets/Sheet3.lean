@@ -30,18 +30,45 @@ variable (X : Type) -- Everything will be a subset of `X`
   (x y z : X) -- x,y,z are elements of `X` or, more precisely, terms of type `X`
 
 -- x,y,z are elements of `X` or, more precisely, terms of type `X`
-example : x ∉ A → x ∈ A → False := by sorry
+example : x ∉ A → x ∈ A → False := by
+  intro xna xa
+  exact xna xa
 
-example : x ∈ A → x ∉ A → False := by sorry
+example : x ∈ A → x ∉ A → False := by
+  intro xa xna
+  exact xna xa
 
-example : A ⊆ B → x ∉ B → x ∉ A := by sorry
+example : A ⊆ B → x ∉ B → x ∉ A := by
+  intro ab xnb xa
+  apply xnb
+  exact ab xa
 
 -- Lean couldn't work out what I meant when I wrote `x ∈ ∅` so I had
 -- to give it a hint by telling it the type of `∅`.
-example : x ∉ (∅ : Set X) := by sorry
+example : x ∉ (∅ : Set X) := by
+  intro xo
+  exact xo
 
-example : x ∈ Aᶜ → x ∉ A := by sorry
+example : x ∈ Aᶜ → x ∉ A := by
+  intro xac
+  exact xac
 
-example : (∀ x, x ∈ A) ↔ ¬∃ x, x ∈ Aᶜ := by sorry
+example : (∀ x, x ∈ A) ↔ ¬∃ x, x ∈ Aᶜ := by
+  constructor
+  · intro hx ⟨x, hx2⟩
+    exact hx2 (hx x)
+  · intro hx x
+    by_contra hna
+    apply hx
+    use x, hna
 
-example : (∃ x, x ∈ A) ↔ ¬∀ x, x ∈ Aᶜ := by sorry
+example : (∃ x, x ∈ A) ↔ ¬∀ x, x ∈ Aᶜ := by
+  constructor
+  · rintro ⟨x, hx⟩ xna
+    exact xna x hx
+  · rintro nxna
+    push_neg at nxna
+    have ⟨x, hx⟩ := nxna
+    use x
+    by_contra
+    contradiction
