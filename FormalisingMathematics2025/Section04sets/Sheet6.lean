@@ -38,25 +38,62 @@ for group theory. In Lean we use the notation `f ⁻¹' T` for this pullback.
 
 variable (X Y : Type) (f : X → Y) (S : Set X) (T : Set Y)
 
-example : S ⊆ f ⁻¹' (f '' S) := by sorry
+example : S ⊆ f ⁻¹' (f '' S) := by
+  intro x xs
+  use x
 
-example : f '' (f ⁻¹' T) ⊆ T := by sorry
+example : f '' (f ⁻¹' T) ⊆ T := by
+  intro x hx
+  rw [Set.mem_image] at hx
+  have ⟨y, hy, hfyx⟩ := hx
+  rw [Set.mem_preimage, hfyx] at hy
+  exact hy
 
 -- `library_search` will do this but see if you can do it yourself.
-example : f '' S ⊆ T ↔ S ⊆ f ⁻¹' T := by sorry
+example : f '' S ⊆ T ↔ S ⊆ f ⁻¹' T := by
+  constructor
+  · intro fst x xs
+    apply fst
+    use x
+  · intro sfpt y yfs
+    have ⟨x, hs, fxy⟩ := yfs
+    have := sfpt hs
+    rw [Set.mem_preimage, fxy] at this
+    exact this
 
 -- Pushforward and pullback along the identity map don't change anything
 -- pullback is not so hard
-example : id ⁻¹' S = S := by sorry
+example : id ⁻¹' S = S := by
+  ext x
+  constructor <;> intro h <;> exact h
 
 -- pushforward is a little trickier. You might have to `ext x, split`.
-example : id '' S = S := by sorry
+example : id '' S = S := by
+  ext x
+  constructor
+  · rintro ⟨x', x's, rfl⟩
+    exact x's
+  · intro xs
+    use x, xs
+    rfl
 
 -- Now let's try composition.
 variable (Z : Type) (g : Y → Z) (U : Set Z)
 
 -- preimage of preimage is preimage of comp
-example : g ∘ f ⁻¹' U = f ⁻¹' (g ⁻¹' U) := by sorry
+example : g ∘ f ⁻¹' U = f ⁻¹' (g ⁻¹' U) := by
+  ext x
+  constructor <;> intro hx <;> exact hx
 
 -- preimage of preimage is preimage of comp
-example : g ∘ f '' S = g '' (f '' S) := by sorry
+example : g ∘ f '' S = g '' (f '' S) := by
+  ext z
+  constructor
+  · intro ⟨x, xs, hx⟩
+    use f x
+    constructor
+    · use x
+    · exact hx
+  · rintro ⟨y, ⟨x, xs, rfl⟩, rfl⟩
+    use x, xs
+    rfl
