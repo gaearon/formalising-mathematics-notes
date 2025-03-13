@@ -75,10 +75,14 @@ example : Injective (id : X → X) := by
   -- you can start with `rw injective_def` if you like,
   -- and later you can `rw id_eval`, although remember that `rw` doesn't
   -- work under binders like `∀`, so use `intro` first.
-  sorry
+  rw [injective_def]
+  intro a b h
+  exact h
 
 example : Surjective (id : X → X) := by
-  sorry
+  intro x
+  use x
+  rw [id_eval]
 
 -- Theorem: if f : X → Y and g : Y → Z are injective,
 -- then so is g ∘ f
@@ -127,10 +131,16 @@ example (f : X → Y) (g : Y → Z) (hf : Surjective f) (hg : Surjective g) : Su
 
 -- This is a question on the IUM (Imperial introduction to proof course) function problem sheet
 example (f : X → Y) (g : Y → Z) : Injective (g ∘ f) → Injective f := by
-  sorry
+  intro igf x1 x2 hfx
+  apply igf
+  simp only [comp_eval]
+  rw [hfx]
 
 -- This is another one
 example (f : X → Y) (g : Y → Z) : Surjective (g ∘ f) → Surjective g := by
-  sorry
+  intro sgf z
+  have ⟨x, hx⟩ := sgf z
+  use f x
+  exact hx
 
 end Section3sheet1
