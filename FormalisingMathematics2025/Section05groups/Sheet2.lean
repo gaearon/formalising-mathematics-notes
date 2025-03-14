@@ -103,21 +103,17 @@ class BadGroup (G : Type) extends One G, Mul G, Inv G : Type where
 -- `Bool` is a type with two terms, `Bool.true` and `Bool.false`. See if you can make it into
 -- a bad group which isn't a group!
 instance : One Bool :=
-  ⟨sorry⟩
+  ⟨Bool.true⟩
 
 instance : Mul Bool :=
-  ⟨sorry⟩
+  ⟨fun x y ↦ x⟩
 
 instance : Inv Bool :=
-  ⟨sorry⟩
+  ⟨fun _ ↦ Bool.true⟩
 
 instance : BadGroup Bool where
-  mul_assoc := sorry
-  -- `by decide`, might be able to do this
-  mul_one := sorry
-  -- by decide
-  inv_mul_cancel := sorry
-  -- by decide
+  mul_assoc := by decide
+  mul_one := by decide
+  inv_mul_cancel := by decide
 
-example : ¬∀ a : Bool, 1 * a = a := by sorry
--- by decide
+example : ¬∀ a : Bool, 1 * a = a := by decide
