@@ -25,4 +25,26 @@ this question.
 
 example (L : Type) [Lattice L] :
     (∀ a b c : L, a ⊔ b ⊓ c = (a ⊔ b) ⊓ (a ⊔ c)) ↔ ∀ a b c : L, a ⊓ (b ⊔ c) = a ⊓ b ⊔ a ⊓ c := by
-  sorry
+  constructor
+  · intro h a b c
+    calc
+      a ⊓ (b ⊔ c) = a ⊓ (c ⊔ b) := by rw [sup_comm]
+      _ = a ⊓ (a ⊔ c) ⊓ (c ⊔ b) := by rw [inf_sup_self]
+      _ = a ⊓ (c ⊔ a) ⊓ (c ⊔ b) := by rw [sup_comm]
+      _ = a ⊓ ((c ⊔ a) ⊓ (c ⊔ b)) := by apply inf_assoc
+      _ = a ⊓ (c ⊔ a ⊓ b) := by rw [h]
+      _ = a ⊓ (a ⊓ b ⊔ c) := by rw [sup_comm]
+      _ = (a ⊔ a ⊓ b) ⊓ (a ⊓ b ⊔ c) := by rw [sup_inf_self]
+      _ = (a ⊓ b ⊔ a) ⊓ (a ⊓ b ⊔ c) := by rw [sup_comm]
+      _ = (a ⊓ b) ⊔ (a ⊓ c) := by rw [h]
+  · intro h a b c
+    calc
+      a ⊔ b ⊓ c = a ⊔ c ⊓ b := by rw [inf_comm]
+      _ = a ⊔ (a ⊓ c) ⊔ (c ⊓ b) := by rw [sup_inf_self]
+      _ = a ⊔ (c ⊓ a) ⊔ (c ⊓ b) := by rw [inf_comm]
+      _ = a ⊔ ((c ⊓ a) ⊔ (c ⊓ b)) := by apply sup_assoc
+      _ = a ⊔ (c ⊓ (a ⊔ b)) := by rw [h]
+      _ = a ⊔ ((a ⊔ b) ⊓ c) := by rw [inf_comm]
+      _ = (a ⊓ (a ⊔ b)) ⊔ ((a ⊔ b) ⊓ c) := by rw [inf_sup_self]
+      _ = ((a ⊔ b) ⊓ a) ⊔ ((a ⊔ b) ⊓ c) := by rw [inf_comm]
+      _ = (a ⊔ b) ⊓ (a ⊔ c) := by rw [h]
