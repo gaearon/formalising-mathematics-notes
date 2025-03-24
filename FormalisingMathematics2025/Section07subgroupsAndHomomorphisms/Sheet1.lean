@@ -44,18 +44,30 @@ example (ha : a ∈ H) (hb : b ∈ H) : a * b ∈ H :=
 -- Let's use these axioms to make more API for subgroups.
 -- First, see if you can put the axioms together to prove subgroups are closed under "division".
 example (ha : a ∈ H) (hb : b ∈ H) : a * b⁻¹ ∈ H := by
-  sorry
+  apply mul_mem ha
+  apply inv_mem hb
 
 -- Now try these. You might want to remind yourself of the API for groups as explained
 -- in an earlier section, or make use of the `group` tactic.
 -- This lemma is called `Subgroup.inv_mem_iff` but try proving it yourself
 example : a⁻¹ ∈ H ↔ a ∈ H := by
-  sorry
+  constructor
+  · intro h
+    rw [← inv_inv a]
+    apply inv_mem h
+  · intro h
+    apply inv_mem h
 
 -- this is `mul_mem_cancel_left` but see if you can do it from the axioms of subgroups.
 -- Again feel free to use the `group` tactic.
 example (ha : a ∈ H) : a * b ∈ H ↔ b ∈ H := by
-  sorry
+  constructor
+  · intro h
+    have := mul_mem (inv_mem ha) h
+    rw [← mul_assoc, inv_mul_cancel, one_mul] at this
+    exact this
+  · intro h
+    exact mul_mem ha h
 
 /-
 
@@ -107,16 +119,30 @@ variable {G H} {x : G}
 variable {y z : G}
 
 theorem conjugate.one_mem : (1 : G) ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹} := by
-  sorry
+  use 1
+  constructor
+  · exact H.one_mem
+  · group
 
 theorem conjugate.inv_mem (hy : y ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹}) :
     y⁻¹ ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹} := by
-  sorry
+  obtain ⟨b, ⟨binH, hyb⟩⟩ := hy
+  use b⁻¹
+  constructor
+  · exact H.inv_mem binH
+  · rw [hyb]
+    group
 
 theorem conjugate.mul_mem (hy : y ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹})
     (hz : z ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹}) :
     y * z ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹} := by
-  sorry
+  obtain ⟨b, ⟨binH, hyb⟩⟩ := hy
+  obtain ⟨c, ⟨cinH, hyc⟩⟩ := hz
+  use b * c
+  constructor
+  · exact H.mul_mem binH cinH
+  · rw [hyb, hyc]
+    group
 
 -- Now here's the way to put everything together:
 def conjugate (H : Subgroup G) (x : G) : Subgroup G where
@@ -155,15 +181,43 @@ theorem mem_conjugate_iff : a ∈ conjugate H x ↔ ∃ h, h ∈ H ∧ a = x * h
   rfl
 
 theorem conjugate_mono (H K : Subgroup G) (h : H ≤ K) : conjugate H x ≤ conjugate K x := by
-  sorry
+  rintro g ⟨a, ainh, ha⟩
+  specialize h ainh
+  use a
 
 theorem conjugate_bot : conjugate ⊥ x = ⊥ := by
-  sorry
+  ext a
+  constructor
+  · intro ha
+    obtain ⟨b, binbot, rfl⟩ := ha
+    rw [Subgroup.mem_bot] at *
+    rw [binbot]
+    group
+  · rintro rfl
+    use 1, rfl
+    group
 
 theorem conjugate_top : conjugate ⊤ x = ⊤ := by
-  sorry
+  ext a
+  constructor
+  · intro ha
+    trivial
+  · intro ha
+    use x⁻¹ * a * x
+    constructor
+    · trivial
+    · group
 
 theorem conjugate_eq_of_abelian (habelian : ∀ a b : G, a * b = b * a) : conjugate H x = H := by
-  sorry
+  ext a
+  constructor
+  · rintro ⟨b, hb, rfl⟩
+    rw [habelian]
+    group
+    exact hb
+  · intro ha
+    use a, ha
+    rw [habelian]
+    group
 
 end Section7sheet1
