@@ -66,14 +66,15 @@ example : G →* K :=
 -- The next three lemmas are pretty standard, but they are also in fact
 -- the axioms that show that groups form a category.
 theorem comp_id : φ.comp (MonoidHom.id G) = φ := by
-  sorry
+  ext g
+  rfl
 
 theorem id_comp : (MonoidHom.id H).comp φ = φ := by
-  sorry
+  rfl
 
 theorem comp_assoc {L : Type} [Group L] (ρ : K →* L) :
     (ρ.comp ψ).comp φ = ρ.comp (ψ.comp φ) := by
-  sorry
+  rfl
 
 -- The kernel of a group homomorphism `φ` is a subgroup of the source group.
 -- The elements of the kernel are *defined* to be `{x | φ x = 1}`.
@@ -108,26 +109,44 @@ example (φ : G →* H) (T : Subgroup H) (x : G) : x ∈ T.comap φ ↔ φ x ∈
 -- Here are some basic facts about these constructions.
 -- Preimage of a subgroup along the identity map is the same subgroup
 example (S : Subgroup G) : S.comap (MonoidHom.id G) = S := by
-  sorry
+  ext g
+  constructor <;> intro h <;> exact h
 
 -- Image of a subgroup along the identity map is the same subgroup
 example (S : Subgroup G) : S.map (MonoidHom.id G) = S := by
-  sorry
+  ext g
+  constructor
+  · rintro ⟨x, xs, rfl⟩
+    exact xs
+  · intro gs
+    use g, gs
+    rfl
 
 -- preimage preserves `≤` (i.e. if `S ≤ T` are subgroups of `H` then `φ⁻¹(S) ≤ φ⁻¹(T)`)
 example (φ : G →* H) (S T : Subgroup H) (hST : S ≤ T) : S.comap φ ≤ T.comap φ := by
-  sorry
+  intro g hg
+  exact hST hg
 
 -- image preserves `≤` (i.e. if `S ≤ T` are subgroups of `G` then `φ(S) ≤ φ(T)`)
 example (φ : G →* H) (S T : Subgroup G) (hST : S ≤ T) : S.map φ ≤ T.map φ := by
-  sorry
+  intro _ ⟨x, xs, hx⟩
+  use x, hST xs
 
 -- Pulling a subgroup back along one homomorphism and then another, is equal
 -- to pulling it back along the composite of the homomorphisms.
 example (φ : G →* H) (ψ : H →* K) (U : Subgroup K) : U.comap (ψ.comp φ) = (U.comap ψ).comap φ := by
-  sorry
+  rfl
 
 -- Pushing a subgroup along one homomorphism and then another is equal to
 --  pushing it forward along the composite of the homomorphisms.
 example (φ : G →* H) (ψ : H →* K) (S : Subgroup G) : S.map (ψ.comp φ) = (S.map φ).map ψ := by
-  sorry
+  ext k
+  constructor
+  · rintro ⟨g, gs, hg⟩
+    use φ g
+    constructor
+    · use g
+    · exact hg
+  · rintro ⟨h, ⟨g, gs, hg⟩, hh⟩
+    use g, gs
+    rwa [← hg] at hh
